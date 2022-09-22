@@ -88,18 +88,20 @@ def trata_consulta(consulta):
 
 
 def gera_arquivos():
+    #for loja in range(1,54):
     loja = 14
-    arquivo_retag = repository.repository.gera_arquivo(loja)
-    arquivo = repository.repository.consulta_status_pdv(loja)
-    consulta_banco = pd.DataFrame(arquivo, columns=['loja', 'pdv', 'status_alt', 'status_tot'])
-
-    if arquivo == []:
-        repository.repository.insert_status_pdv(arquivo_retag)
-
-    elif len(arquivo_retag) != len(consulta_banco):
-        df = pandas.DataFrame()
-        ´bf´pbhc
-
-
+    if loja == 5 or loja > 54:
+        pass
     else:
-        repository.repository.update_status_pdv(arquivo_retag)
+        arquivo_retag = repository.repository.gera_arquivo(loja)
+        arquivo = repository.repository.consulta_status_pdv(loja)
+        consulta_banco = pd.DataFrame(arquivo, columns=['loja', 'pdv', 'status_alt', 'status_tot'])
+        if arquivo == []:
+            repository.repository.insert_status_pdv(arquivo_retag)
+        elif len(arquivo_retag) != len(consulta_banco):
+            dif_pdv = pd.concat([arquivo_retag, consulta_banco]).drop_duplicates(subset=['pdv'], keep=False, ignore_index=True)
+            repository.repository.insert_status_pdv(dif_pdv)
+        else:
+            repository.repository.update_status_pdv(arquivo_retag)
+
+gera_arquivos()

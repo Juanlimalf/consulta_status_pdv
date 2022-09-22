@@ -70,18 +70,18 @@ def update_status_pdv(arquivo_retag):
     con.con_mysql.close()
     cursor.close()
 
-def insert_status_pdv(arquivo_retag):
+def insert_status_pdv(arquivo):
 
     #Abrindo a conexão com o banco e cursor
     con = Conexao()
     cursor = con.con_mysql.cursor()
 
-    for linha in range(len(arquivo_retag.loja)):
+    for linha in range(len(arquivo.loja)):
         today = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        l = arquivo_retag.loja[linha]
-        pRet = arquivo_retag.pdv[linha]
-        altRet = arquivo_retag.status_alt[linha]
-        totRet = arquivo_retag.status_tot[linha]
+        l = arquivo.loja[linha]
+        pRet = arquivo.pdv[linha]
+        altRet = arquivo.status_alt[linha]
+        totRet = arquivo.status_tot[linha]
 
         cursor.execute(F"INSERT INTO carga_lojas (loja, pdv, status_alt, data_inclusao, status_total) "
                        F"VALUES({l}, {pRet}, '{altRet}', '{today}', '{totRet}') ")
@@ -94,69 +94,64 @@ def insert_status_pdv(arquivo_retag):
 
 def busca_arquivo_retag(loja, arquivo):
     # Fazendo a conexão com os Retag Lojas
-    if loja == 5 or loja > 54:
-        return 'loja não exixte'
     if loja == 14:
         retorno = shutil.copy(f"//192.168.141.150/c/log_carga_pdv/{str(arquivo)}",
                               f"./repository/arquivo/{str(arquivo)}")
-        return retorno
     elif loja == 21:
         retorno = shutil.copy(f"//192.168.21.100/c/log_carga_pdv/{arquivo}",
                     f"./repository/arquivo/{str(arquivo)}")
-        return retorno
     elif loja == 26:
         retorno = shutil.copy(f"//192.168.26.150/c/log_carga_pdv/{str(arquivo)}",
                     f"./repository/arquivo/{str(arquivo)}")
-        return retorno
     elif loja == 30:
         retorno = shutil.copy(f"//192.168.30.102/c/log_carga_pdv/{str(arquivo)}",
                     f"./repository/arquivo/{str(arquivo)}")
-        return retorno
     elif loja == 49:
         retorno = shutil.copy(f"//10.132.49.101/c/log_carga_pdv/{str(arquivo)}",
                     f"./repository/arquivo/{str(arquivo)}")
-        return retorno
     else:
         retorno = shutil.copy(f"//192.168.{loja}.101/c/log_carga_pdv/{str(arquivo)}",
                     f"./repository/arquivo/{str(arquivo)}")
-        return retorno
-
 
 def gera_arquivo(loja):
-    dados = []
-    #nome dos arquivos padrão do retag
-    name_arq = ['PRALT.txt', 'PRPRD.txt']
-    for arquivo in name_arq:
-        #copiando os arquivos do Retag
-        busca_arquivo_retag(loja, str(arquivo))
-        #montando o arquivo da loja
-        if str(arquivo) == 'PRALT.txt':
-            with open("./repository/arquivo//PRALT.txt") as files:
-                for f in files:
-                    a = f.split("|")
-                    l = loja
-                    p = str(a[1])
-                    if a[2] == "ATUALIZADO\n":
-                        s = "T"
-                    else:
-                        s = "F"
-                    dado = [l, p, s]
-                    dados.append(dado)
-                monta_arq_PRALT = pd.DataFrame(dados, columns=['loja', 'pdv', 'status_alt'])
-                dados = []
-        if str(arquivo) == 'PRPRD.txt':
-            with open("./repository/arquivo//PRPRD.txt") as files:
-                for f in files:
-                    a = f.split("|")
-                    p = str(a[1])
-                    if a[2] == "ATUALIZADO\n":
-                        s = "T"
-                    else:
-                        s = "F"
-                    dado = [p, s]
-                    dados.append(dado)
-                    monta_arq_PRPRD = pd.DataFrame(dados, columns=['pdv', 'status_tot'])
-                dados = []
-    #retonando o arquivo montado
-    arquivo = pd.merge(monta_arq_PRALT, monta_arq_PRPRD, how='left', on='pdv')
-    return arquivo
+    try:
+        dados = []
+        #nome dos arquivos padrão do retag
+        name_arq = ['PRALT.txt', 'PRPRD.txt']
+        for arquivo in name_arq:
+            #copiando os arquivos do Retag
+            busca_arquivo_retag(loja, str(arquivo))
+            #montando o arquivo da loja
+            if str(arquivo) == 'PRALT.txt':
+                with open("./repository/arquivo/PRALT.txt") as files:
+                    for f in files:
+                        a = f.split("|")
+                        l = loja
+                        p = str(a[1])
+                        if a[2] == "ATUALIZADO\n":
+                            s = "T"
+                        else:
+                            s = "F"
+                        dado = [l, p, s]
+                        dados.append(dado)
+                    monta_arq_PRALT = pd.DataFrame(dados, columns=['loja', 'pdv', 'status_alt'])
+                    dados = []
+            if str(arquivo) == 'PRPRD.txt':
+                with open("./repository/arquivo/PRPRD.txt") as files:
+                    for f in files:
+                        a = f.split("|")
+                        p = str(a[1])
+                        if a[2] == "ATUALIZADO\n":
+                            s = "T"
+                        else:
+                            s = "F"
+                        dado = [p, s]
+                        dados.append(dado)
+                        monta_arq_PRPRD = pd.DataFrame(dados, columns=['pdv', 'status_tot'])
+                    dados = []
+        #retonando o arquivo montado
+        arquivo = pd.merge(monta_arq_PRALT, monta_arq_PRPRD, how='left', on='pdv')
+        return arquivo
+    except Exception as E:
+        print(E)
+        return E
