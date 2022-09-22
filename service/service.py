@@ -98,6 +98,7 @@ def gera_arquivos():
 
     elif len(arquivo_retag) != len(consulta_banco):
         df = pandas.DataFrame()
+        ´bf´pbhc
 
 
     else:
