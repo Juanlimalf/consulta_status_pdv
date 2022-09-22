@@ -95,10 +95,10 @@ def insert_status_pdv(arquivo_retag):
 def busca_arquivo_retag(loja, arquivo):
     # Fazendo a conexão com os Retag Lojas
     if loja == 5 or loja > 54:
-        print('loja não exixte')
+        return 'loja não exixte'
     if loja == 14:
         retorno = shutil.copy(f"//192.168.141.150/c/log_carga_pdv/{str(arquivo)}",
-                    f"../repository/arquivo/{str(arquivo)}")
+                              f"./repository/arquivo/{str(arquivo)}")
         return retorno
     elif loja == 21:
         retorno = shutil.copy(f"//192.168.21.100/c/log_carga_pdv/{arquivo}",
@@ -131,7 +131,7 @@ def gera_arquivo(loja):
         busca_arquivo_retag(loja, str(arquivo))
         #montando o arquivo da loja
         if str(arquivo) == 'PRALT.txt':
-            with open(f"../repository/arquivo/{str(arquivo)}") as files:
+            with open("./repository/arquivo//PRALT.txt") as files:
                 for f in files:
                     a = f.split("|")
                     l = loja
@@ -145,7 +145,7 @@ def gera_arquivo(loja):
                 monta_arq_PRALT = pd.DataFrame(dados, columns=['loja', 'pdv', 'status_alt'])
                 dados = []
         if str(arquivo) == 'PRPRD.txt':
-            with open(f"../repository/arquivo/{str(arquivo)}") as files:
+            with open("./repository/arquivo//PRPRD.txt") as files:
                 for f in files:
                     a = f.split("|")
                     p = str(a[1])

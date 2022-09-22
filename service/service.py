@@ -99,7 +99,6 @@ def gera_arquivos():
 
     elif len(arquivo_retag) != len(consulta_banco):
         pass
+
     else:
         repository.repository.update_status_pdv(arquivo_retag)
-
-gera_arquivos()

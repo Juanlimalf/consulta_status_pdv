@@ -48,5 +48,7 @@ def busca_pdv_lojas(page_num: int = 1, page_size: int = 30):
     response = service.trata_consulta(carga)
     return response
 
+service.gera_arquivos()
+
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=6008, log_level="info")
