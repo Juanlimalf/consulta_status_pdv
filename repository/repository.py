@@ -155,3 +155,21 @@ def gera_arquivo(loja):
     except Exception as E:
         print(E)
         return E
+
+def atualiza_status_manutencao(arquivo):
+
+    # Abrindo a conexão com o banco e cursor
+    con = Conexao()
+    cursor = con.con_mysql.cursor()
+    l = arquivo.loja
+    print(l)
+    p = arquivo.pdv
+    print(p)
+    altManut = arquivo.status_manutencao
+    print(altManut)
+    cursor.execute(F"UPDATE carga_lojas c SET c.status_manutencao = '{altManut}' WHERE c.loja = {l} AND c.pdv = {p} ")
+    # fazendo o commit das informações
+    con.con_mysql.commit()
+    # Fechando a conexão com o banco e cursor
+    con.con_mysql.close()
+    cursor.close()

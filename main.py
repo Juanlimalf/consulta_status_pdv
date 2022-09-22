@@ -48,5 +48,10 @@ def busca_pdv_lojas(page_num: int = 1, page_size: int = 30):
     response = service.trata_consulta(carga)
     return response
 
+@app.put("/atualizaStatusManutencao", response_model=model.Message , tags=["Atualiza Status Pdvs em Manutenção"], status_code=200)
+def atualiza_status(alteracao: model.AtualizaStatusPdv):
+    response = service.atualiza_status_pdv(alteracao)
+    return response
+
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=6008, log_level="info")

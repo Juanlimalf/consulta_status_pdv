@@ -10,7 +10,7 @@ class Paginacao(BaseModel):
 
 class ConsultaPdv(BaseModel):
     loja:int
-    pdv:Optional[int] = None
+    pdv:int
     datainclusao:Optional[str] = None
     dataalteracao:Optional[str] = None
     status_alt:Optional[str] = None
@@ -20,3 +20,8 @@ class ConsultaPdv(BaseModel):
     status_manutencao:Optional[str] = None
     page_num:Optional[int] = 1
     page_size:Optional[int] = 30
+
+class AtualizaStatusPdv(BaseModel):
+    loja:int
+    pdv:int
+    status_manutencao:str
