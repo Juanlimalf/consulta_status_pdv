@@ -1,7 +1,9 @@
+import pandas
 import pandas as pd
 from fastapi.responses import JSONResponse
 from model import model
 import repository.repository
+from datetime import datetime
 
 
 def monta_consulta_pdv_loja(start,end, page_size):
@@ -9,6 +11,7 @@ def monta_consulta_pdv_loja(start,end, page_size):
     lista_lojas = []
     lista_pdv = []
     count = 0
+    today = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     i = 1
     while i < 54:
         for linha in lojas:
@@ -16,8 +19,6 @@ def monta_consulta_pdv_loja(start,end, page_size):
                 loja = linha[0]
                 monta_jason = {
                     "pdv": linha[1],
-                    "data_inclusao": linha[2],
-                    "data_alteracao": linha[3],
                     "status_alt": linha[4],
                     "status_total": linha[5],
                     "status_operador": linha[6],
@@ -35,11 +36,9 @@ def monta_consulta_pdv_loja(start,end, page_size):
             lista_lojas.append(lista)
             lista_pdv = []
         count = 0
-
         i += 1
-
     data_length = len(lista_lojas)
-    return {"lojas": lista_lojas[start:end], "paginacao": [{"total": data_length, "count": page_size}]}
+    return { "data_atualização": today, "lojas": lista_lojas[start:end], "paginacao": [{"total": data_length, "count": page_size}]}
 
 def monta_consulta_pdv(loja, start, end, page_size):
     consulta = []
@@ -98,7 +97,8 @@ def gera_arquivos():
         repository.repository.insert_status_pdv(arquivo_retag)
 
     elif len(arquivo_retag) != len(consulta_banco):
-        pass
+        df = pandas.DataFrame()
+
 
     else:
         repository.repository.update_status_pdv(arquivo_retag)
