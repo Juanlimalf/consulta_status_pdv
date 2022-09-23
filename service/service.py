@@ -40,6 +40,7 @@ def monta_consulta_pdv_loja(start,end, page_size):
     data_length = len(lista_lojas)
     return { "data_atualização": today, "lojas": lista_lojas[start:end], "paginacao": [{"total": data_length, "count": page_size}]}
 
+
 def monta_consulta_pdv(loja, start, end, page_size):
     consulta = []
     busca_consulta = repository.repository.consulta_pdv(loja)
@@ -59,9 +60,9 @@ def monta_consulta_pdv(loja, start, end, page_size):
                 status_finalizadora=linha[7],
                 status_manutencao=linha[8]
             ))
-        print(length)
 
         return {"lojas": consulta[start:end], "paginacao": [{"total": length, "count": page_size}]}
+
 
 def monta_consulta_pdv_full():
     busca_consulta = repository.repository.consulta_pdv_full()
@@ -87,6 +88,16 @@ def trata_consulta(consulta):
         return consulta
 
 
+def atualiza_status_pdv(arquivo):
+    response = repository.repository.atualiza_status_manutencao(arquivo)
+    return response
+
+
+def deletaPdv(arquivo):
+    response = repository.repository.deletaPdv(arquivo)
+    return response
+
+
 def gera_arquivos():
     #for loja in range(1,54):
     loja = 14
@@ -103,11 +114,3 @@ def gera_arquivos():
             repository.repository.insert_status_pdv(dif_pdv)
         else:
             repository.repository.update_status_pdv(arquivo_retag)
-
-def atualiza_status_pdv(arquivo):
-    response = repository.repository.atualiza_status_manutencao(arquivo)
-    return response
-
-def deletaPdv(arquivo):
-    response = repository.repository.deletaPdv(arquivo)
-    return response
