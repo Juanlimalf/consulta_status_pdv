@@ -105,5 +105,9 @@ def gera_arquivos():
             repository.repository.update_status_pdv(arquivo_retag)
 
 def atualiza_status_pdv(arquivo):
-    repository.repository.atualiza_status_manutencao(arquivo)
-    return JSONResponse(status_code=200, content={"message": 'Atualizado com Sucesso'})
+    response = repository.repository.atualiza_status_manutencao(arquivo)
+    return response
+
+def deletaPdv(arquivo):
+    response = repository.repository.deletaPdv(arquivo)
+    return response

@@ -25,3 +25,7 @@ class AtualizaStatusPdv(BaseModel):
     loja:int
     pdv:int
     status_manutencao:str
+
+class deletaPdv(BaseModel):
+    loja: int
+    pdv: int

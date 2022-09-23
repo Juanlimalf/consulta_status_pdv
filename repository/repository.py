@@ -2,6 +2,7 @@ from connection.connection import Conexao
 import shutil
 import pandas as pd
 from datetime import datetime
+from fastapi.responses import JSONResponse
 
 
 def consulta_pdv(loja):
@@ -93,26 +94,28 @@ def insert_status_pdv(arquivo):
     cursor.close()
 
 def busca_arquivo_retag(loja, arquivo):
-    # Fazendo a conexão com os Retag Lojas
-    if loja == 14:
-        retorno = shutil.copy(f"//192.168.141.150/c/log_carga_pdv/{str(arquivo)}",
-                              f"./repository/arquivo/{str(arquivo)}")
-    elif loja == 21:
-        retorno = shutil.copy(f"//192.168.21.100/c/log_carga_pdv/{arquivo}",
-                    f"./repository/arquivo/{str(arquivo)}")
-    elif loja == 26:
-        retorno = shutil.copy(f"//192.168.26.150/c/log_carga_pdv/{str(arquivo)}",
-                    f"./repository/arquivo/{str(arquivo)}")
-    elif loja == 30:
-        retorno = shutil.copy(f"//192.168.30.102/c/log_carga_pdv/{str(arquivo)}",
-                    f"./repository/arquivo/{str(arquivo)}")
-    elif loja == 49:
-        retorno = shutil.copy(f"//10.132.49.101/c/log_carga_pdv/{str(arquivo)}",
-                    f"./repository/arquivo/{str(arquivo)}")
-    else:
-        retorno = shutil.copy(f"//192.168.{loja}.101/c/log_carga_pdv/{str(arquivo)}",
-                    f"./repository/arquivo/{str(arquivo)}")
-
+    try:
+        # Fazendo a conexão com os Retag Lojas
+        if loja == 14:
+            retorno = shutil.copy(f"//192.168.141.150/c/log_carga_pdv/{str(arquivo)}",
+                                  f"./repository/arquivo/{str(arquivo)}")
+        elif loja == 21:
+            retorno = shutil.copy(f"//192.168.21.100/c/log_carga_pdv/{arquivo}",
+                        f"./repository/arquivo/{str(arquivo)}")
+        elif loja == 26:
+            retorno = shutil.copy(f"//192.168.26.150/c/log_carga_pdv/{str(arquivo)}",
+                        f"./repository/arquivo/{str(arquivo)}")
+        elif loja == 30:
+            retorno = shutil.copy(f"//192.168.30.102/c/log_carga_pdv/{str(arquivo)}",
+                        f"./repository/arquivo/{str(arquivo)}")
+        elif loja == 49:
+            retorno = shutil.copy(f"//10.132.49.101/c/log_carga_pdv/{str(arquivo)}",
+                        f"./repository/arquivo/{str(arquivo)}")
+        else:
+            retorno = shutil.copy(f"//192.168.{loja}.101/c/log_carga_pdv/{str(arquivo)}",
+                        f"./repository/arquivo/{str(arquivo)}")
+    except Exception as E:
+        return E
 def gera_arquivo(loja):
     try:
         dados = []
@@ -157,19 +160,39 @@ def gera_arquivo(loja):
         return E
 
 def atualiza_status_manutencao(arquivo):
+    try:
+        # Abrindo a conexão com o banco e cursor
+        con = Conexao()
+        cursor = con.con_mysql.cursor()
+        l = arquivo.loja
+        print(l)
+        p = arquivo.pdv
+        print(p)
+        altManut = arquivo.status_manutencao
+        print(altManut)
+        cursor.execute(F"UPDATE carga_lojas c SET c.status_manutencao = '{altManut}' WHERE c.loja = {l} AND c.pdv = {p} ")
+        # fazendo o commit das informações
+        con.con_mysql.commit()
+        # Fechando a conexão com o banco e cursor
+        con.con_mysql.close()
+        cursor.close()
+        return JSONResponse(status_code=200, content={"message": 'Atualizado com Sucesso'})
+    except:
+        return JSONResponse(status_code=404, content={"message": "Não encontrado"})
 
-    # Abrindo a conexão com o banco e cursor
-    con = Conexao()
-    cursor = con.con_mysql.cursor()
-    l = arquivo.loja
-    print(l)
-    p = arquivo.pdv
-    print(p)
-    altManut = arquivo.status_manutencao
-    print(altManut)
-    cursor.execute(F"UPDATE carga_lojas c SET c.status_manutencao = '{altManut}' WHERE c.loja = {l} AND c.pdv = {p} ")
-    # fazendo o commit das informações
-    con.con_mysql.commit()
-    # Fechando a conexão com o banco e cursor
-    con.con_mysql.close()
-    cursor.close()
+def deletaPdv(arquivo):
+    try:
+        # Abrindo a conexão com o banco e cursor
+        con = Conexao()
+        cursor = con.con_mysql.cursor()
+        l = arquivo.loja
+        p = arquivo.pdv
+        cursor.execute(F"DELETE from carga_lojas WHERE loja = {l} and pdv = {p} ")
+        # fazendo o commit das informações
+        con.con_mysql.commit()
+        # Fechando a conexão com o banco e cursor
+        con.con_mysql.close()
+        cursor.close()
+        return JSONResponse(status_code=200, content={"message": 'Pdv Deletado com Sucesso'})
+    except:
+        return JSONResponse(status_code=404, content={"message": "Não encontrado"})
