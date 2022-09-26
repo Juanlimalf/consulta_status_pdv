@@ -22,33 +22,19 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-@app.get("/consultaPdv", tags=["Consulta"], status_code=200)
-def consulta_pdv2(page_num:int=1,page_size:int=30):
-    busca_consulta = service.monta_consulta_pdv_full()
-    consulta = service.trata_consulta(busca_consulta)
-    length = len(consulta)
+
+
+@app.get("/pdv", tags=["Monit Pdv"], status_code=200)
+def busca_pdv_lojas(page_num: int = 1, page_size: int = 5):
     start = (page_num - 1) * page_size
     end = start + page_size
-    response = {"lojas": consulta[start:end], "paginacao": [{"total": length, "count": page_size}]}
+    response = service.monta_consulta_pdv_loja(start, end, page_size)
     return response
-@app.get("/consultaPdv/{loja}", tags=["Consulta"], status_code=200)
-def consulta_pdv(loja:int,page_num:int=1,page_size:int=30):
-    start = (page_num - 1) * page_size
-    end = start + page_size
-    busca_consulta = service.monta_consulta_pdv(loja, start, end, page_size)
-    return busca_consulta
-@app.get("/buscaPdvsLojas", tags=["Consulta"], status_code=200)
-def busca_pdv_lojas(page_num: int = 1, page_size: int = 30):
-    start = (page_num - 1) * page_size
-    end = start + page_size
-    carga = service.monta_consulta_pdv_loja(start, end, page_size)
-    response = service.trata_consulta(carga)
-    return response
-@app.put("/atualizaStatusManutencao", response_model=model.Message , tags=["Atualiza/Deleta"], status_code=200)
+@app.put("/pdv", response_model=model.Message , tags=["Monit Pdv"], status_code=200)
 def atualiza_status(alteracao: model.AtualizaStatusPdv):
     response = service.atualiza_status_pdv(alteracao)
     return response
-@app.delete("/deletaPdv", response_model=model.Message, tags=["Atualiza/Deleta"], status_code=200)
+@app.delete("/pdv", response_model=model.Message, tags=["Monit Pdv"], status_code=200)
 def deleta_pdv(deletaPdv: model.deletaPdv):
     response = service.deletaPdv(deletaPdv)
     return response

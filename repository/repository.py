@@ -5,22 +5,6 @@ from datetime import datetime
 from fastapi.responses import JSONResponse
 
 
-def consulta_pdv(loja):
-    con = Conexao()
-    cursor = con.con_mysql.cursor()
-
-    cursor.execute(f"SELECT cl.loja, cl.pdv, "
-                   f"cl.data_inclusao, cl.data_alteracao, "
-                   f"cl.status_alt, cl.status_total, cl.status_operador, "
-                   f"cl.status_finalizadora, cl.status_manutencao "
-                   f"FROM carga_lojas cl "
-                   f"WHERE cl.loja = {loja} ")
-    consulta = cursor.fetchall()
-    con.con_mysql.close()
-    cursor.close()
-    return consulta
-
-
 def consulta_pdv_full():
     con = Conexao()
     cursor = con.con_mysql.cursor()
