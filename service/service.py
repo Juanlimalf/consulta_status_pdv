@@ -6,7 +6,7 @@ import repository.repository
 from datetime import datetime
 
 
-def monta_consulta_pdv_loja(start,end, page_size):
+def monta_consulta_pdv_loja(start, end, page_size):
     lojas = repository.repository.consulta_pdv_full()
     lista_lojas = []
     lista_pdv = []
@@ -105,9 +105,10 @@ def gera_arquivos():
         pass
     else:
         arquivo_retag = repository.repository.gera_arquivo(loja)
-        arquivo = repository.repository.consulta_status_pdv(loja)
-        consulta_banco = pd.DataFrame(arquivo, columns=['loja', 'pdv', 'status_alt', 'status_tot'])
-        if arquivo == []:
+        consulta_banco = pd.DataFrame(repository.repository.consulta_status_pdv(loja), columns=['loja', 'pdv', 'status_alt', 'status_tot'])
+        if arquivo_retag == [] or arquivo_retag.empty is True:
+            pass
+        elif consulta_banco.empty is True:
             repository.repository.insert_status_pdv(arquivo_retag)
         elif len(arquivo_retag) != len(consulta_banco):
             dif_pdv = pd.concat([arquivo_retag, consulta_banco]).drop_duplicates(subset=['pdv'], keep=False, ignore_index=True)

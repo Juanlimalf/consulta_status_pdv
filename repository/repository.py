@@ -193,18 +193,20 @@ def gera_arquivo(loja):
                 with open("./repository/arquivo/PRPRD.txt") as files:
                     for f in files:
                         a = f.split("|")
+                        l = loja
                         p = str(a[1])
                         if a[2] == "ATUALIZADO\n":
                             s = "T"
                         else:
                             s = "F"
-                        dado = [p, s]
+                        dado = [l, p, s]
                         dados.append(dado)
-                        monta_arq_PRPRD = pd.DataFrame(dados, columns=['pdv', 'status_tot'])
+                        monta_arq_PRPRD = pd.DataFrame(dados, columns=['loja', 'pdv', 'status_tot'])
                     dados = []
         # retonando o arquivo montado
-        arquivo = pd.merge(monta_arq_PRALT, monta_arq_PRPRD, how='left', on='pdv')
+        arquivo = pd.merge(monta_arq_PRALT, monta_arq_PRPRD, how='inner', on=['loja', 'pdv'], )
         return arquivo
     except Exception as E:
         print(E)
-        return E
+        lista = []
+        return lista
