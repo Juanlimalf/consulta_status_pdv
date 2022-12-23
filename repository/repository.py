@@ -2,7 +2,9 @@ from connection.connection import Conexao
 import shutil
 import pandas as pd
 from datetime import datetime
-from fastapi.responses import JSONResponse
+from log.log import log
+
+logger = log()
 
 
 def consulta_pdv_full():
@@ -38,30 +40,26 @@ def consulta_status_pdv(loja):
 
 
 def insert_status_pdv(arquivo):
-    try:
-        # Abrindo a conexão com o banco e cursor
-        con = Conexao()
-        cursor = con.con_mysql.cursor()
+    # Abrindo a conexão com o banco e cursor
+    con = Conexao()
+    cursor = con.con_mysql.cursor()
 
-        for linha in range(len(arquivo.loja)):
-            today = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            l = arquivo.loja[linha]
-            pRet = arquivo.pdv[linha]
-            altRet = arquivo.status_alt[linha]
-            totRet = arquivo.status_tot[linha]
+    for linha in range(len(arquivo.loja)):
+        today = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        l = arquivo.loja[linha]
+        pRet = arquivo.pdv[linha]
+        altRet = arquivo.status_alt[linha]
+        totRet = arquivo.status_tot[linha]
 
-            cursor.execute(F"INSERT INTO carga_lojas (loja, pdv, status_alt, data_inclusao, status_total) "
-                           F"VALUES({l}, {pRet}, '{altRet}', '{today}', '{totRet}') ")
+        cursor.execute(F"INSERT INTO carga_lojas (loja, pdv, status_alt, data_inclusao, status_total) "
+                       F"VALUES({l}, {pRet}, '{altRet}', '{today}', '{totRet}') ")
 
-        # Fazendo o commit das informações
-        con.con_mysql.commit()
-        # Fechando a conexão com o banco e cursor
-        con.con_mysql.close()
-        cursor.close()
+    # Fazendo o commit das informações
+    con.con_mysql.commit()
+    # Fechando a conexão com o banco e cursor
+    con.con_mysql.close()
+    cursor.close()
 
-        return JSONResponse(status_code=200, content={"message": 'Atualizado com Sucesso'})
-    except:
-        return JSONResponse(status_code=404, content={"message": "Não encontrado"})
 
 
 def update_status_pdv(arquivo_retag):
@@ -85,82 +83,78 @@ def update_status_pdv(arquivo_retag):
 
 
 def atualiza_status_manutencao(arquivo):
-    try:
-        # Abrindo a conexão com o banco e cursor
-        con = Conexao()
-        cursor = con.con_mysql.cursor()
-        l = arquivo.loja
-        print(l)
-        p = arquivo.pdv
-        print(p)
-        altManut = arquivo.status_manutencao
-        print(altManut)
-        cursor.execute(
-            F"UPDATE carga_lojas c SET c.status_manutencao = '{altManut}' WHERE c.loja = {l} AND c.pdv = {p} ")
-        # fazendo o commit das informações
-        con.con_mysql.commit()
-        # Fechando a conexão com o banco e cursor
-        con.con_mysql.close()
-        cursor.close()
-        return JSONResponse(status_code=200, content={"message": 'Atualizado com Sucesso'})
-    except:
-        return JSONResponse(status_code=404, content={"message": "Não encontrado"})
+    # Abrindo a conexão com o banco e cursor
+    con = Conexao()
+    cursor = con.con_mysql.cursor()
+    l = arquivo.loja
+    p = arquivo.pdv
+    altManut = arquivo.status_manutencao
+    cursor.execute(
+        F"UPDATE carga_lojas c SET c.status_manutencao = '{altManut}' WHERE c.loja = {l} AND c.pdv = {p} ")
+    # fazendo o commit das informações
+    con.con_mysql.commit()
+    # Fechando a conexão com o banco e cursor
+    con.con_mysql.close()
+    cursor.close()
+
 
 
 def deletaPdv(arquivo):
-    try:
-        # Abrindo a conexão com o banco e cursor
-        con = Conexao()
-        cursor = con.con_mysql.cursor()
-        l = arquivo.loja
-        p = arquivo.pdv
-        cursor.execute(F"DELETE from carga_lojas WHERE loja = {l} and pdv = {p} ")
-        # fazendo o commit das informações
-        con.con_mysql.commit()
-        # Fechando a conexão com o banco e cursor
-        con.con_mysql.close()
-        cursor.close()
-        return JSONResponse(status_code=200, content={"message": 'Pdv Deletado com Sucesso'})
-    except:
-        return JSONResponse(status_code=404, content={"message": "Não encontrado"})
+    # Abrindo a conexão com o banco e cursor
+    con = Conexao()
+    cursor = con.con_mysql.cursor()
+    l = arquivo.loja
+    p = arquivo.pdv
+    cursor.execute(F"DELETE from carga_lojas WHERE loja = {l} and pdv = {p} ")
+    # fazendo o commit das informações
+    con.con_mysql.commit()
+    # Fechando a conexão com o banco e cursor
+    con.con_mysql.close()
+    cursor.close()
+
 
 
 def busca_arquivo_retag(loja, arquivo):
     try:
         # Fazendo a conexão com os Retag Lojas
         if loja == 14:
-            retorno = shutil.copy(f"//192.168.141.150/c/log_carga_pdv/{str(arquivo)}",
-                                  f"./repository/arquivo/{str(arquivo)}")
+            shutil.copy(f"//192.168.141.150/c/log_carga_pdv/{str(arquivo)}",
+                        f"./arquivo/{str(arquivo)}")
         elif loja == 21:
-            retorno = shutil.copy(f"//192.168.21.100/c/log_carga_pdv/{arquivo}",
-                                  f"./repository/arquivo/{str(arquivo)}")
+            shutil.copy(f"//192.168.21.100/c/log_carga_pdv/{arquivo}",
+                        f"./arquivo/{str(arquivo)}")
         elif loja == 26:
-            retorno = shutil.copy(f"//192.168.26.150/c/log_carga_pdv/{str(arquivo)}",
-                                  f"./repository/arquivo/{str(arquivo)}")
+            shutil.copy(f"//192.168.26.150/c/log_carga_pdv/{str(arquivo)}",
+                        f"./arquivo/{str(arquivo)}")
         elif loja == 30:
-            retorno = shutil.copy(f"//192.168.30.102/c/log_carga_pdv/{str(arquivo)}",
-                                  f"./repository/arquivo/{str(arquivo)}")
+            shutil.copy(f"//192.168.30.102/c/log_carga_pdv/{str(arquivo)}",
+                        f"./arquivo/{str(arquivo)}")
         elif loja == 49:
-            retorno = shutil.copy(f"//10.132.49.101/c/log_carga_pdv/{str(arquivo)}",
-                                  f"./repository/arquivo/{str(arquivo)}")
+            shutil.copy(f"//10.132.49.101/c/log_carga_pdv/{str(arquivo)}",
+                        f"./arquivo/{str(arquivo)}")
         else:
-            retorno = shutil.copy(f"//192.168.{loja}.101/c/log_carga_pdv/{str(arquivo)}",
-                                  f"./repository/arquivo/{str(arquivo)}")
+            shutil.copy(f"//192.168.{loja}.101/c/log_carga_pdv/{str(arquivo)}",
+                        f"./arquivo/{str(arquivo)}")
+        logger.info(f'Acesso Retag loja {loja} feito com sucesso')
+        return True
     except Exception as E:
-        return E
+        logger.error(f'loja: {loja} - {E}')
+        return None
 
 
 def gera_arquivo(loja):
     try:
         dados = []
-        # nome dos arquivos padrão do retag
         name_arq = ['PRALT.txt', 'PRPRD.txt']
-        for arquivo in name_arq:
+        arq = 1
+        for name in name_arq:
             # copiando os arquivos do Retag
-            busca_arquivo_retag(loja, str(arquivo))
+            arq = busca_arquivo_retag(loja, str(name))
+            if arq == None:
+                continue
             # montando o arquivo da loja
-            if str(arquivo) == 'PRALT.txt':
-                with open("./repository/arquivo/PRALT.txt") as files:
+            if str(name) == 'PRALT.txt':
+                with open(f"./arquivo/PRALT.txt") as files:
                     for f in files:
                         a = f.split("|")
                         l = loja
@@ -173,8 +167,8 @@ def gera_arquivo(loja):
                         dados.append(dado)
                     monta_arq_PRALT = pd.DataFrame(dados, columns=['loja', 'pdv', 'status_alt'])
                     dados = []
-            if str(arquivo) == 'PRPRD.txt':
-                with open("./repository/arquivo/PRPRD.txt") as files:
+            if str(name) == 'PRPRD.txt':
+                with open(f"./arquivo/PRPRD.txt") as files:
                     for f in files:
                         a = f.split("|")
                         l = loja
@@ -187,10 +181,15 @@ def gera_arquivo(loja):
                         dados.append(dado)
                         monta_arq_PRPRD = pd.DataFrame(dados, columns=['loja', 'pdv', 'status_tot'])
                     dados = []
-        # retonando o arquivo montado
-        arquivo = pd.merge(monta_arq_PRALT, monta_arq_PRPRD, how='inner', on=['loja', 'pdv'], )
-        return arquivo
+                # retonando o arquivo montado
+
+        arquivos = pd.merge(monta_arq_PRALT, monta_arq_PRPRD, how='inner', on=['loja', 'pdv'])
+        logger.info(f'Arquivo Retag loja {loja} montado')
+        if arq is not None:
+            return arquivos
+        else:
+            return arq
+
     except Exception as E:
-        print(E)
-        lista = []
-        return lista
+        logger.error(f'loja: {loja}-{E}')
+        return None

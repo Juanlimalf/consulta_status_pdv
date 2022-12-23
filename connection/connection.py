@@ -1,13 +1,20 @@
 import mysql.connector
 from mysql.connector import Error
-import sqlalchemy as db
+from decouple import config
+
+
+user = config("user")
+password = config("password")
+host = config("host")
+database = config("database")
+
 
 class Conexao:
     try:
         def __init__(self):
-            self.con_mysql = mysql.connector.connect(host="nagumo-labs.ccnxv4osz7rv.us-east-1.rds.amazonaws.com",
-                                              user="admin",
-                                              password="n4gum0L4bs",
-                                              database="pdv_carga")
+            self.con_mysql = mysql.connector.connect(host=host,
+                                              user=user,
+                                              password=password,
+                                              database=database)
     except Error as E:
         print(E)

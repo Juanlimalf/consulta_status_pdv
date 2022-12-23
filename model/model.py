@@ -1,31 +1,36 @@
 from pydantic import BaseModel
-from typing import Optional, List
+from typing import Optional
+
 
 class Message(BaseModel):
     message: str
+
 
 class Paginacao(BaseModel):
     total: int
     count: int
 
+
 class ConsultaPdv(BaseModel):
-    loja:int
-    pdv:int
-    datainclusao:Optional[str] = None
-    dataalteracao:Optional[str] = None
-    status_alt:Optional[str] = None
-    status_total:Optional[str] = None
-    status_operador:Optional[str] = None
-    status_finalizadora:Optional[str] = None
-    status_manutencao:Optional[str] = None
-    page_num:Optional[int] = 1
-    page_size:Optional[int] = 30
+    loja: int
+    pdv: int
+    datainclusao: Optional[str] = None
+    dataalteracao: Optional[str] = None
+    status_alt: Optional[str] = None
+    status_total: Optional[str] = None
+    status_operador: Optional[str] = None
+    status_finalizadora: Optional[str] = None
+    status_manutencao: Optional[str] = None
+    page_num: Optional[int] = 1
+    page_size: Optional[int] = 30
+
 
 class AtualizaStatusPdv(BaseModel):
-    loja:int
-    pdv:int
-    status_manutencao:str
+    loja: int
+    pdv: int
+    status_manutencao: str
 
-class deletaPdv(BaseModel):
+
+class DeletaPdv(BaseModel):
     loja: int
     pdv: int
