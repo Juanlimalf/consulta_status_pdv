@@ -7,7 +7,7 @@ from asyncio import run
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 """
-Esse projeto foi desenvolvido utilizando o framework FastApi e utiliza uma biblioteca chamada APScheduler para agendar 
+Esse projeto foi desenvolvido utilizando o framework FastApi e utiliza uma biblioteca chamada APScheduler para agendar
 tarefas de atualização e reset de status dos checkouts.
 
 O "@router_pdv.on_event("startup)" e "@router_pdv.on_event("shutdown)" são eventos do FastApi que são executados quando o projeto é
@@ -28,12 +28,15 @@ def update_status():
 # Função para resetar o status dos checkouts no banco de dados
 def reset_status():
     run(CheckoutsService.reset_status())
+    run(CheckoutsService.update_status_checkout())
 
 
 # Instanciando o scheduler e adicionando as funções que serão executadas
 scheduler = AsyncIOScheduler()
 scheduler.add_job(update_status, 'interval', hours=1)
+scheduler.add_job(reset_status, 'interval', seconds=30)
 scheduler.add_job(reset_status, 'cron', hour=4, minute=0, second=0)
+
 
 # Eventos do FastApi para iniciar e finalizar o scheduler
 @router_pdv.on_event("startup")
@@ -80,8 +83,17 @@ async def deleta_pdv(request: LojaSchema):
 
 
 @router_pdv.put("/pdv/atualizar", status_code=status.HTTP_200_OK)
-async def atualiza_loja(loja: str = None):
+async def update_status(loja: str = None):
     """Atualiza a lista de checkouts da loja no banco de dados"""
     await CheckoutsService.update_status_checkout(loja=loja)
 
     return Message(message="Atualizado com sucesso")
+
+
+@router_pdv.put("/pdv/reset", status_code=status.HTTP_200_OK)
+async def reset_status():
+    """Atualiza a lista de checkouts da loja no banco de dados"""
+    await CheckoutsService.reset_status()
+    await CheckoutsService.update_status_checkout()
+
+    return Message(message="Resetado com sucesso")

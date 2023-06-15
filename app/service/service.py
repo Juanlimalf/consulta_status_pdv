@@ -41,7 +41,7 @@ class CheckoutsService:
         store_list = []
         checkouts_list = []
 
-        for i in range(1, 55):
+        for i in range(1, 56):
             # separando as lojas
             for data in datas:
 
@@ -57,14 +57,15 @@ class CheckoutsService:
                     }
 
                     checkouts_list.append(checkout)
+            if checkouts_list:
+                # montando a lista de lojas
+                store_list.append(
+                    {
+                        "loja": i,
+                        "pdvs": checkouts_list
+                    }
+                )
 
-            # montando a lista de lojas
-            store_list.append(
-                {
-                    "loja": i,
-                    "pdvs": checkouts_list
-                }
-            )
             checkouts_list = []
 
         # arquivo de lojas gerado
@@ -209,7 +210,7 @@ class CheckoutsService:
 
     @classmethod
     async def reset_status(cls):
-        logger.info('iniciando a atualização dos status dos checkouts')
+        logger.info('iniciando a reset dos status dos checkouts')
         # abrindo conexão com o banco
         with DBconnection() as session:
             # instanciando os repositorios
@@ -217,7 +218,7 @@ class CheckoutsService:
 
         # Atualizando os status para 0
         repositoryCheckout.update_all()
-        logger.info('fim da atualização dos status dos checkouts')
+        logger.info('fim da reset dos status dos checkouts')
 
     @staticmethod
     async def get_file_retag(stores: list):
